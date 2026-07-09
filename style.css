@@ -38,3 +38,97 @@ button{
 
     cursor:pointer;
 }
+
+/* 스코어보드 */
+.scoreboard{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:20px;
+    font-size:14px;
+}
+
+.scoreboard td, .scoreboard th{
+    border:1px solid #444;
+    padding:5px;
+    text-align:center;
+}
+
+.scoreboard th{
+    background:#2a2a2a;
+}
+
+/* 다이아몬드 */
+.diamond-wrap{
+    display:flex;
+    justify-content:center;
+    margin:20px 0;
+}
+
+.diamond{
+    position:relative;
+    width:140px;
+    height:140px;
+}
+
+.base{
+    position:absolute;
+    width:30px;
+    height:30px;
+    background:#444;
+    border:2px solid #777;
+    transform:rotate(45deg);
+    transition:background 0.2s;
+}
+
+.base-1{ right:0; bottom:35px; }
+.base-2{ left:55px; top:0; }
+.base-3{ left:0; bottom:35px; }
+
+.base.active{
+    background:#ffd400;
+    border-color:#ffea70;
+}
+
+/* 볼/스트라이크/아웃 카운트 */
+.count-row{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    margin-bottom:15px;
+}
+
+.count-group{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.count-label{
+    font-weight:bold;
+    margin-right:4px;
+    color:#bbbbbb;
+}
+
+.dot{
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:#444;
+    border:2px solid #777;
+    transition:background 0.2s;
+}
+
+.dot.active-ball{
+    background:#4caf50;
+    border-color:#7fd989;
+}
+
+.dot.active-strike{
+    background:#f44336;
+    border-color:#ff8a80;
+}
+
+.dot.active-out{
+    background:#ffffff;
+    border-color:#cccccc;
+}

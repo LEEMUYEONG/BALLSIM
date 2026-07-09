@@ -24,14 +24,41 @@
 </div>
 
 <div class="container" id="gameScreen" style="display:none; width:600px;">
-    <h1 id="scoreBoard">0회 초 | 어웨이 0 : 0 홈</h1>
-    <p id="statusLine">0B 0S | 0아웃 | 주자: -</p>
+
+    <table id="inningBoard" class="scoreboard"></table>
+
+    <div class="diamond-wrap">
+        <div class="diamond">
+            <div class="base base-2" id="base2"></div>
+            <div class="base base-3" id="base3"></div>
+            <div class="base base-1" id="base1"></div>
+        </div>
+    </div>
+
+    <div class="count-row">
+        <div class="count-group">
+            <span class="count-label">B</span>
+            <div class="dot" id="ball1"></div>
+            <div class="dot" id="ball2"></div>
+            <div class="dot" id="ball3"></div>
+        </div>
+        <div class="count-group">
+            <span class="count-label">S</span>
+            <div class="dot" id="strike1"></div>
+            <div class="dot" id="strike2"></div>
+        </div>
+        <div class="count-group">
+            <span class="count-label">O</span>
+            <div class="dot" id="out1"></div>
+            <div class="dot" id="out2"></div>
+        </div>
+    </div>
 
     <button id="btnNextPitch">다음 공</button>
     <button id="btnNextBatter">다음 타자</button>
     <button id="btnNextHalfInning">다음 이닝(초/말)</button>
 
-    <div id="logBox" style="text-align:left; height:350px; overflow-y:auto; border:1px solid #444; padding:10px; margin-top:15px;"></div>
+    <div id="logBox"></div>
     <button id="btnBackToMain">메인으로</button>
 </div>
 

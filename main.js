@@ -66,13 +66,57 @@ function setupGame() {
 }
 
 function updateUI() {
-    const half = game.topOfInning ? "초" : "말";
-    scoreBoard.textContent = `${game.inning}회 ${half} | 어웨이 ${game.awayScore} : ${game.homeScore} 홈`;
+    updateScoreboard();
+    updateDiamond();
+    updateCount();
+}
 
-    const baseText = `1루${game.bases[0] ? "●" : "-"} 2루${game.bases[1] ? "●" : "-"} 3루${game.bases[2] ? "●" : "-"}`;
-    statusLine.textContent = `${game.balls}B ${game.strikes}S | ${game.outs}아웃 | ${baseText}`;
+function updateScoreboard() {
+    const board = document.getElementById("inningBoard");
+    let html = "<tr><th>팀</th>";
+    for (let i = 1; i <= game.maxInning; i++) {
+        html += `<th>${i}</th>`;
+    }
+    html += "<th>R</th></tr>";
 
-    if (game.isGameOver) {
-        statusLine.textContent += " | 경기 종료";
+    html += "<tr><td>어웨이</td>";
+    for (let i = 1; i <= game.maxInning; i++) {
+        html += `<td>${getInningScore(true, i)}</td>`;
+    }
+    html += `<td>${game.awayScore}</td></tr>`;
+
+    html += "<tr><td>홈</td>";
+    for (let i = 1; i <= game.maxInning; i++) {
+        html += `<td>${getInningScore(false, i)}</td>`;
+    }
+    html += `<td>${game.homeScore}</td></tr>`;
+
+    board.innerHTML = html;
+}
+
+// 이닝별 득점 기록이 아직 없으므로, 현재 이닝만 강조 표시하는 임시 버전
+function getInningScore(isAway, inningNum) {
+    if (inningNum === game.inning) {
+        const isCurrentHalf = isAway === game.topOfInning;
+        return isCurrentHalf ? (game.topOfInning ? "▶" : "▶") : "";
+    }
+    return "";
+}
+
+function updateDiamond() {
+    document.getElementById("base1").classList.toggle("active", game.bases[0]);
+    document.getElementById("base2").classList.toggle("active", game.bases[1]);
+    document.getElementById("base3").classList.toggle("active", game.bases[2]);
+}
+
+function updateCount() {
+    for (let i = 1; i <= 3; i++) {
+        document.getElementById(`ball${i}`).classList.toggle("active-ball", i <= game.balls);
+    }
+    for (let i = 1; i <= 2; i++) {
+        document.getElementById(`strike${i}`).classList.toggle("active-strike", i <= game.strikes);
+    }
+    for (let i = 1; i <= 2; i++) {
+        document.getElementById(`out${i}`).classList.toggle("active-out", i <= game.outs);
     }
 }
