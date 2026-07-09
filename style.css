@@ -39,6 +39,51 @@ button{
     cursor:pointer;
 }
 
+/* 게임 화면 레이아웃 */
+#gameScreen{
+    width:900px;
+    margin:40px auto;
+}
+
+.game-layout{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+}
+
+.log-panel{
+    width:350px;
+    flex-shrink:0;
+}
+
+#logBox{
+    height:500px;
+    border:1px solid #444;
+    padding:10px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    box-sizing:border-box;
+    text-align:left;
+}
+
+#logBox p{
+    margin:2px 0;
+    font-size:14px;
+    color:#dddddd;
+    flex-shrink:0;
+}
+
+.info-panel{
+    flex:1;
+    text-align:center;
+}
+
+.info-panel button{
+    width:200px;
+}
+
 /* 스코어보드 */
 .scoreboard{
     width:100%;
@@ -59,15 +104,32 @@ button{
 
 /* 다이아몬드 */
 .diamond-wrap{
-    display:flex;
-    justify-content:center;
-    margin:20px 0;
+    position:relative;
+    width:200px;
+    height:200px;
+    margin:30px auto;
+    overflow:visible;
+}
+
+.diamond-lines{
+    position:absolute;
+    top:0;
+    left:0;
+    width:200px;
+    height:200px;
+    pointer-events:none;
+}
+
+.diamond-lines polyline{
+    fill:none;
+    stroke:white;
+    stroke-width:2;
 }
 
 .diamond{
     position:relative;
-    width:140px;
-    height:140px;
+    width:200px;
+    height:200px;
 }
 
 .base{
@@ -80,14 +142,29 @@ button{
     transition:background 0.2s;
 }
 
-.base-1{ right:0; bottom:35px; }
-.base-2{ left:55px; top:0; }
-.base-3{ left:0; bottom:35px; }
+.base-2{ left:85px; top:5px; }
+.base-1{ left:165px; top:85px; }
+.base-3{ left:5px; top:85px; }
+.base-home{ left:85px; top:165px; }
 
 .base.active{
     background:#ffd400;
     border-color:#ffea70;
 }
+
+.base-label{
+    position:absolute;
+    width:100px;
+    text-align:center;
+    font-size:12px;
+    color:#ffd400;
+    font-weight:bold;
+}
+
+#label2{ left:50px; top:-18px; }
+#label1{ left:130px; top:70px; }
+#label3{ left:-30px; top:70px; }
+#labelHome{ left:50px; top:190px; }
 
 /* 볼/스트라이크/아웃 카운트 */
 .count-row{
@@ -124,11 +201,11 @@ button{
 }
 
 .dot.active-strike{
-    background:#f44336;
-    border-color:#ff8a80;
+    background:#ffd400;
+    border-color:#ffe97a;
 }
 
 .dot.active-out{
-    background:#ffffff;
-    border-color:#cccccc;
+    background:#f44336;
+    border-color:#ff8a80;
 }

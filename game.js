@@ -32,7 +32,7 @@ class Game {
         this.outs = 0;
         this.balls = 0;
         this.strikes = 0;
-        this.bases = [false, false, false];
+        this.bases = [null, null, null];
 
         this.awayScore = 0;
         this.homeScore = 0;
@@ -121,31 +121,34 @@ class Game {
         else this.homeScore += runs;
     }
 
+    // constructor 안
+     // 기존 [false, false, false] 대신
+
+// hit()
     hit(bases) {
         const batter = this.battingTeam.currentBatter;
         const names = ["", "1루타", "2루타", "3루타", "홈런"];
         this.log.add(`${batter.name} ${names[bases]}!`);
 
         if (bases === 4) {
-            const runners = this.bases.filter(b => b).length;
+            const runners = this.bases.filter(b => b !== null).length;
             this.addScore(runners + 1);
-            this.bases = [false, false, false];
+            this.bases = [null, null, null];
             this.log.add(`${runners + 1}점 득점!`);
         } else {
-            const newBases = [false, false, false];
+            const newBases = [null, null, null];
             let runsScored = 0;
 
             for (let i = 2; i >= 0; i--) {
-                if (this.bases[i]) {
+                if (this.bases[i] !== null) {
                     const newPos = i + bases;
                     if (newPos >= 3) runsScored++;
-                    else newBases[newPos] = true;
+                    else newBases[newPos] = this.bases[i];
                 }
             }
-
             const batterPos = bases - 1;
             if (batterPos >= 3) runsScored++;
-            else newBases[batterPos] = true;
+            else newBases[batterPos] = batter.name;
 
             this.bases = newBases;
             if (runsScored > 0) {
@@ -153,26 +156,25 @@ class Game {
                 this.log.add(`${runsScored}점 득점!`);
             }
         }
-
         this.endAtBat();
     }
-
+    // walk()
     walk() {
         const batter = this.battingTeam.currentBatter;
         this.log.add(`${batter.name} 볼넷 출루`);
 
         const newBases = [...this.bases];
-        if (newBases[0]) {
-            if (newBases[1]) {
-                if (newBases[2]) {
+        if (newBases[0] !== null) {
+            if (newBases[1] !== null) {
+                if (newBases[2] !== null) {
                     this.addScore(1);
                     this.log.add(`밀어내기 득점!`);
                 }
-                newBases[2] = true;
+                newBases[2] = newBases[1];
             }
-            newBases[1] = true;
+            newBases[1] = newBases[0];
         }
-        newBases[0] = true;
+        newBases[0] = batter.name;
         this.bases = newBases;
 
         this.endAtBat();
@@ -204,7 +206,7 @@ class Game {
         this.log.add(`--- ${this.inning}회 ${half} 종료 (어웨이 ${this.awayScore} : 홈 ${this.homeScore}) ---`);
 
         this.outs = 0;
-        this.bases = [false, false, false];
+        this.bases = [null, null, null];
         this.halfInningOver = true;
 
         if (!this.topOfInning) {

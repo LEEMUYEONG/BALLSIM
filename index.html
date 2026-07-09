@@ -23,43 +23,63 @@
 
 </div>
 
-<div class="container" id="gameScreen" style="display:none; width:600px;">
+<div id="gameScreen" style="display:none;">
 
-    <table id="inningBoard" class="scoreboard"></table>
+    <div class="game-layout">
 
-    <div class="diamond-wrap">
-        <div class="diamond">
-            <div class="base base-2" id="base2"></div>
-            <div class="base base-3" id="base3"></div>
-            <div class="base base-1" id="base1"></div>
+        <div class="log-panel">
+            <div id="logBox"></div>
         </div>
+
+        <div class="info-panel">
+            <table id="inningBoard" class="scoreboard"></table>
+
+            <div class="diamond-wrap">
+                <svg class="diamond-lines" viewBox="0 0 200 200">
+                    <polyline points="100,180 180,100 100,20 20,100 100,180" />
+                </svg>
+                <div class="diamond">
+                    <div class="base-label" id="label2"></div>
+                    <div class="base base-2" id="base2"></div>
+
+                    <div class="base-label" id="label3"></div>
+                    <div class="base base-3" id="base3"></div>
+
+                    <div class="base-label" id="label1"></div>
+                    <div class="base base-1" id="base1"></div>
+
+                    <div class="base-label" id="labelHome"></div>
+                    <div class="base base-home" id="baseHome"></div>
+                </div>
+            </div>
+
+            <div class="count-row">
+                <div class="count-group">
+                    <span class="count-label">B</span>
+                    <div class="dot" id="ball1"></div>
+                    <div class="dot" id="ball2"></div>
+                    <div class="dot" id="ball3"></div>
+                </div>
+                <div class="count-group">
+                    <span class="count-label">S</span>
+                    <div class="dot" id="strike1"></div>
+                    <div class="dot" id="strike2"></div>
+                </div>
+                <div class="count-group">
+                    <span class="count-label">O</span>
+                    <div class="dot" id="out1"></div>
+                    <div class="dot" id="out2"></div>
+                </div>
+            </div>
+
+            <button id="btnNextPitch">다음 공</button>
+            <button id="btnNextBatter">다음 타자</button>
+            <button id="btnNextHalfInning">다음 이닝(초/말)</button>
+            <button id="btnBackToMain">메인으로</button>
+        </div>
+
     </div>
 
-    <div class="count-row">
-        <div class="count-group">
-            <span class="count-label">B</span>
-            <div class="dot" id="ball1"></div>
-            <div class="dot" id="ball2"></div>
-            <div class="dot" id="ball3"></div>
-        </div>
-        <div class="count-group">
-            <span class="count-label">S</span>
-            <div class="dot" id="strike1"></div>
-            <div class="dot" id="strike2"></div>
-        </div>
-        <div class="count-group">
-            <span class="count-label">O</span>
-            <div class="dot" id="out1"></div>
-            <div class="dot" id="out2"></div>
-        </div>
-    </div>
-
-    <button id="btnNextPitch">다음 공</button>
-    <button id="btnNextBatter">다음 타자</button>
-    <button id="btnNextHalfInning">다음 이닝(초/말)</button>
-
-    <div id="logBox"></div>
-    <button id="btnBackToMain">메인으로</button>
 </div>
 
 <script src="log.js"></script>

@@ -48,10 +48,15 @@ function setupGame() {
     const originalAdd = log.add.bind(log);
     log.add = (message) => {
         originalAdd(message);
+
         const line = document.createElement("p");
         line.textContent = message;
         logBox.appendChild(line);
-        logBox.scrollTop = logBox.scrollHeight;
+
+        // 박스 높이를 넘으면 가장 오래된(맨 위) 줄부터 제거
+        while (logBox.scrollHeight > logBox.clientHeight && logBox.firstChild) {
+            logBox.removeChild(logBox.firstChild);
+        }
     };
 
     const awayLineup = Array.from({ length: 9 }, (_, i) => createBatter(`어웨이타자${i + 1}`));
@@ -104,9 +109,18 @@ function getInningScore(isAway, inningNum) {
 }
 
 function updateDiamond() {
-    document.getElementById("base1").classList.toggle("active", game.bases[0]);
-    document.getElementById("base2").classList.toggle("active", game.bases[1]);
-    document.getElementById("base3").classList.toggle("active", game.bases[2]);
+    setBase("base1", "label1", game.bases[0]);
+    setBase("base2", "label2", game.bases[1]);
+    setBase("base3", "label3", game.bases[2]);
+
+    const batterName = game.isGameOver ? "" : game.battingTeam.currentBatter.name;
+    document.getElementById("baseHome").classList.toggle("active", !game.isGameOver);
+    document.getElementById("labelHome").textContent = batterName;
+}
+
+function setBase(baseId, labelId, runnerName) {
+    document.getElementById(baseId).classList.toggle("active", runnerName !== null);
+    document.getElementById(labelId).textContent = runnerName || "";
 }
 
 function updateCount() {
