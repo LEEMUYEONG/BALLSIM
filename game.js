@@ -2,28 +2,52 @@ function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
-class Game {
-    constructor(lineup, pitcher, log) {
-        this.lineup = lineup;   // Player(batter) 9명
-        this.pitcher = pitcher; // Player(pitcher) 1명
-        this.log = log;
-
-        this.inning = 1;
-        this.maxInning = 9;
-
-        this.outs = 0;
-        this.balls = 0;
-        this.strikes = 0;
-
-        this.bases = [false, false, false]; // [1루, 2루, 3루]
-        this.score = 0;
-
+class Team {
+    constructor(name, lineup, pitcher) {
+        this.name = name;
+        this.lineup = lineup;
+        this.pitcher = pitcher;
         this.batterIndex = 0;
-        this.isGameOver = false;
     }
 
     get currentBatter() {
         return this.lineup[this.batterIndex];
+    }
+
+    nextBatter() {
+        this.batterIndex = (this.batterIndex + 1) % this.lineup.length;
+    }
+}
+
+class Game {
+    constructor(awayTeam, homeTeam, log) {
+        this.away = awayTeam;
+        this.home = homeTeam;
+        this.log = log;
+
+        this.inning = 1;
+        this.maxInning = 9;
+        this.topOfInning = true; // true = 초(어웨이 공격), false = 말(홈 공격)
+
+        this.outs = 0;
+        this.balls = 0;
+        this.strikes = 0;
+        this.bases = [false, false, false];
+
+        this.awayScore = 0;
+        this.homeScore = 0;
+
+        this.isGameOver = false;
+        this.atBatOver = false;
+        this.halfInningOver = false;
+    }
+
+    get battingTeam() {
+        return this.topOfInning ? this.away : this.home;
+    }
+
+    get pitchingTeam() {
+        return this.topOfInning ? this.home : this.away;
     }
 
     resetCount() {
@@ -31,15 +55,15 @@ class Game {
         this.strikes = 0;
     }
 
-    // 투구 1회 진행
     throwPitch() {
-        if (this.isGameOver) return;
+        if (this.isGameOver || this.halfInningOver) return;
 
-        const pitcher = this.pitcher;
-        const batter = this.currentBatter;
+        this.atBatOver = false;
 
-        // 1) 스트라이크존 판정
-        const strikeZoneChance = 0.45 + (pitcher.stats.control / 100) * 0.2; // 0.45~0.65
+        const pitcher = this.pitchingTeam.pitcher;
+        const batter = this.battingTeam.currentBatter;
+
+        const strikeZoneChance = 0.45 + (pitcher.stats.control / 100) * 0.2;
         const inZone = Math.random() < strikeZoneChance;
 
         if (!inZone) {
@@ -49,7 +73,6 @@ class Game {
             return;
         }
 
-        // 2) 컨택 판정
         const contactChance = clamp(0.5 + (batter.stats.contact - pitcher.stats.stuff) / 200, 0.1, 0.9);
         const madeContact = Math.random() < contactChance;
 
@@ -60,19 +83,17 @@ class Game {
             return;
         }
 
-        // 3) 파울 판정
         if (Math.random() < 0.35) {
             if (this.strikes < 2) this.strikes++;
             this.log.add(`파울 (${this.balls}B ${this.strikes}S)`);
             return;
         }
 
-        // 4) 인플레이 타구 결과 판정
         this.resolveBattedBall();
     }
 
     resolveBattedBall() {
-        const batter = this.currentBatter;
+        const batter = this.battingTeam.currentBatter;
         const power = batter.stats.power;
         const rand = Math.random() * 100;
 
@@ -95,14 +116,19 @@ class Game {
         }
     }
 
+    addScore(runs) {
+        if (this.topOfInning) this.awayScore += runs;
+        else this.homeScore += runs;
+    }
+
     hit(bases) {
-        const batter = this.currentBatter;
+        const batter = this.battingTeam.currentBatter;
         const names = ["", "1루타", "2루타", "3루타", "홈런"];
         this.log.add(`${batter.name} ${names[bases]}!`);
 
         if (bases === 4) {
             const runners = this.bases.filter(b => b).length;
-            this.score += runners + 1;
+            this.addScore(runners + 1);
             this.bases = [false, false, false];
             this.log.add(`${runners + 1}점 득점!`);
         } else {
@@ -122,23 +148,24 @@ class Game {
             else newBases[batterPos] = true;
 
             this.bases = newBases;
-            this.score += runsScored;
-            if (runsScored > 0) this.log.add(`${runsScored}점 득점!`);
+            if (runsScored > 0) {
+                this.addScore(runsScored);
+                this.log.add(`${runsScored}점 득점!`);
+            }
         }
 
-        this.resetCount();
-        this.nextBatter();
+        this.endAtBat();
     }
 
     walk() {
-        const batter = this.currentBatter;
+        const batter = this.battingTeam.currentBatter;
         this.log.add(`${batter.name} 볼넷 출루`);
 
         const newBases = [...this.bases];
         if (newBases[0]) {
             if (newBases[1]) {
                 if (newBases[2]) {
-                    this.score++;
+                    this.addScore(1);
                     this.log.add(`밀어내기 득점!`);
                 }
                 newBases[2] = true;
@@ -148,8 +175,7 @@ class Game {
         newBases[0] = true;
         this.bases = newBases;
 
-        this.resetCount();
-        this.nextBatter();
+        this.endAtBat();
     }
 
     strikeOut() {
@@ -160,26 +186,74 @@ class Game {
     out() {
         this.outs++;
         this.log.add(`아웃! (${this.outs}아웃)`);
-        this.resetCount();
-        this.nextBatter();
-        this.checkInningEnd();
-    }
+        this.endAtBat();
 
-    nextBatter() {
-        this.batterIndex = (this.batterIndex + 1) % this.lineup.length;
-    }
-
-    checkInningEnd() {
         if (this.outs >= 3) {
-            this.log.add(`--- ${this.inning}회 종료 (누적 ${this.score}점) ---`);
-            this.outs = 0;
-            this.bases = [false, false, false];
-            this.inning++;
+            this.endHalfInning();
+        }
+    }
 
+    endAtBat() {
+        this.resetCount();
+        this.battingTeam.nextBatter();
+        this.atBatOver = true;
+    }
+
+    endHalfInning() {
+        const half = this.topOfInning ? "초" : "말";
+        this.log.add(`--- ${this.inning}회 ${half} 종료 (어웨이 ${this.awayScore} : 홈 ${this.homeScore}) ---`);
+
+        this.outs = 0;
+        this.bases = [false, false, false];
+        this.halfInningOver = true;
+
+        if (!this.topOfInning) {
+            this.inning++;
             if (this.inning > this.maxInning) {
                 this.isGameOver = true;
-                this.log.add(`경기 종료! 최종 점수: ${this.score}점`);
+                this.log.add(`경기 종료! 최종 스코어 어웨이 ${this.awayScore} : 홈 ${this.homeScore}`);
             }
+        }
+    }
+
+    proceedToNextHalf() {
+        if (this.isGameOver) return;
+        this.topOfInning = !this.topOfInning;
+        this.halfInningOver = false;
+        this.log.add(`--- ${this.inning}회 ${this.topOfInning ? "초" : "말"} 시작 ---`);
+    }
+
+    // ===== 버튼에서 호출할 단위별 진행 함수 =====
+
+    stepPitch() {
+        if (this.isGameOver) return;
+        if (this.halfInningOver) {
+            this.proceedToNextHalf();
+            return;
+        }
+        this.throwPitch();
+    }
+
+    stepBatter() {
+        if (this.isGameOver) return;
+        if (this.halfInningOver) {
+            this.proceedToNextHalf();
+            return;
+        }
+        this.atBatOver = false;
+        while (!this.atBatOver && !this.halfInningOver && !this.isGameOver) {
+            this.throwPitch();
+        }
+    }
+
+    stepHalfInning() {
+        if (this.isGameOver) return;
+        if (this.halfInningOver) {
+            this.proceedToNextHalf();
+            return;
+        }
+        while (!this.halfInningOver && !this.isGameOver) {
+            this.throwPitch();
         }
     }
 }

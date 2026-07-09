@@ -4,11 +4,15 @@ const mainScreen = document.getElementById("mainScreen");
 const gameScreen = document.getElementById("gameScreen");
 const logBox = document.getElementById("logBox");
 const scoreBoard = document.getElementById("scoreBoard");
+const statusLine = document.getElementById("statusLine");
+
+let game = null;
 
 document.getElementById("btnPlayGame").addEventListener("click", () => {
     mainScreen.style.display = "none";
     gameScreen.style.display = "block";
-    startGame();
+    setupGame();
+    updateUI();
 });
 
 document.getElementById("btnBackToMain").addEventListener("click", () => {
@@ -17,17 +21,30 @@ document.getElementById("btnBackToMain").addEventListener("click", () => {
     logBox.innerHTML = "";
 });
 
-// 나머지 버튼은 아직 미구현
 ["btnSeason", "btnTeam", "btnPlayers", "btnSettings"].forEach(id => {
     document.getElementById(id).addEventListener("click", () => {
         alert("아직 준비중인 기능입니다.");
     });
 });
 
-function startGame() {
+document.getElementById("btnNextPitch").addEventListener("click", () => {
+    game.stepPitch();
+    updateUI();
+});
+
+document.getElementById("btnNextBatter").addEventListener("click", () => {
+    game.stepBatter();
+    updateUI();
+});
+
+document.getElementById("btnNextHalfInning").addEventListener("click", () => {
+    game.stepHalfInning();
+    updateUI();
+});
+
+function setupGame() {
     const log = new Log();
 
-    // 로그 추가될 때마다 화면에도 출력
     const originalAdd = log.add.bind(log);
     log.add = (message) => {
         originalAdd(message);
@@ -37,15 +54,25 @@ function startGame() {
         logBox.scrollTop = logBox.scrollHeight;
     };
 
-    const lineup = Array.from({ length: 9 }, (_, i) => createBatter(`타자${i + 1}`));
-    const pitcher = createPitcher("상대투수");
-    const game = new Game(lineup, pitcher, log);
+    const awayLineup = Array.from({ length: 9 }, (_, i) => createBatter(`어웨이타자${i + 1}`));
+    const awayPitcher = createPitcher("어웨이투수");
+    const awayTeam = new Team("어웨이", awayLineup, awayPitcher);
 
-    scoreBoard.textContent = "경기 시작!";
+    const homeLineup = Array.from({ length: 9 }, (_, i) => createBatter(`홈타자${i + 1}`));
+    const homePitcher = createPitcher("홈투수");
+    const homeTeam = new Team("홈", homeLineup, homePitcher);
 
-    while (!game.isGameOver) {
-        game.throwPitch();
+    game = new Game(awayTeam, homeTeam, log);
+}
+
+function updateUI() {
+    const half = game.topOfInning ? "초" : "말";
+    scoreBoard.textContent = `${game.inning}회 ${half} | 어웨이 ${game.awayScore} : ${game.homeScore} 홈`;
+
+    const baseText = `1루${game.bases[0] ? "●" : "-"} 2루${game.bases[1] ? "●" : "-"} 3루${game.bases[2] ? "●" : "-"}`;
+    statusLine.textContent = `${game.balls}B ${game.strikes}S | ${game.outs}아웃 | ${baseText}`;
+
+    if (game.isGameOver) {
+        statusLine.textContent += " | 경기 종료";
     }
-
-    scoreBoard.textContent = `최종 스코어: ${game.score}점`;
 }

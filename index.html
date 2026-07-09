@@ -24,9 +24,14 @@
 </div>
 
 <div class="container" id="gameScreen" style="display:none; width:600px;">
-    <h1>경기 진행중</h1>
-    <div id="scoreBoard"></div>
-    <div id="logBox" style="text-align:left; height:400px; overflow-y:auto; border:1px solid #444; padding:10px;"></div>
+    <h1 id="scoreBoard">0회 초 | 어웨이 0 : 0 홈</h1>
+    <p id="statusLine">0B 0S | 0아웃 | 주자: -</p>
+
+    <button id="btnNextPitch">다음 공</button>
+    <button id="btnNextBatter">다음 타자</button>
+    <button id="btnNextHalfInning">다음 이닝(초/말)</button>
+
+    <div id="logBox" style="text-align:left; height:350px; overflow-y:auto; border:1px solid #444; padding:10px; margin-top:15px;"></div>
     <button id="btnBackToMain">메인으로</button>
 </div>
 
