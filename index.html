@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BALLSIM</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container" id="mainScreen">
+
+    <h1>⚾ BALLSIM ⚾</h1>
+
+    <p>Baseball Management Simulator</p>
+
+    <button id="btnPlayGame">경기 시작</button>
+    <button id="btnSeason">시즌 시작</button>
+    <button id="btnTeam">팀 관리</button>
+    <button id="btnPlayers">선수 데이터</button>
+    <button id="btnSettings">설정</button>
+
+</div>
+
+<div class="container" id="gameScreen" style="display:none; width:600px;">
+    <h1>경기 진행중</h1>
+    <div id="scoreBoard"></div>
+    <div id="logBox" style="text-align:left; height:400px; overflow-y:auto; border:1px solid #444; padding:10px;"></div>
+    <button id="btnBackToMain">메인으로</button>
+</div>
+
+<script src="log.js"></script>
+<script src="player.js"></script>
+<script src="game.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>
